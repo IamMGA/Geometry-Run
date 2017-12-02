@@ -7,10 +7,14 @@ function Game(){
   canvas.height = 600;
 
   this.player = new Player();
-  this.player.updateCanvas();
+  this.map = new Map();
 }
 Game.prototype.draw = function() {
-    this.player.updateCanvas();
+  this.map.draw();
+    this.player.draw();
+    //setInterval(this.map.draw, 20);
+    // this.map.draw();
+    window.requestAnimationFrame(this.draw.bind(this));
 }
 var game = new Game("canvas");
 game.draw();
