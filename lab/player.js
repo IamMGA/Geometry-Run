@@ -51,7 +51,12 @@ function Player() {
   this.gravity = 2;
   this.isJumping = false;
   this.hasGravity = false;
+  this.suelo = 340;
 
+  this.left = function () { return this.x }
+  this.right = function () { return (this.x + this.width) }
+  this.top = function () { return this.y }
+  this.bottom = function () { return this.y + (this.height) }
   document.onkeydown = this.onKeyDown.bind(this);
 }
 
@@ -80,7 +85,7 @@ Player.prototype.draw = function(){
       }
   }
 
-  if (this.isJumping && this.y >= 340) {
+  if (this.isJumping && this.y >= this.suelo) {
     this.isJumping = false;
     this.hasGravity = false;
     this.yMove = 0;
@@ -110,11 +115,16 @@ Player.prototype.jump = function(){
 
 }
 
-Player.prototype.collitions = function (obstacle){
-  if(this.x + this.sprite.width/this.sprite.frames*this.scale < obstacle.x || this.y + this.sprite.height*this.scale < obstacle.y && this.x > obstacle.x){
+Player.prototype.collitions = function (obstacle) {
+  if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + this.sprite.height * this.scale < obstacle.y || this.x > obstacle.x) {
     this.x;
-  }else{
-    this.x-=5
+  } else {
+    this.x -= 5
+  }
+  if (this.y + obstacle.cube.height * this.scale && this.x > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
+    this.suelo = obstacle.y - this.sprite.height * this.scale;
+  } else {
+    this.suelo = 340;
   }
 }
 

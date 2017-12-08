@@ -28,7 +28,6 @@ Game.prototype.addObstacle = function(){
 Game.prototype.draw = function () {
   for(var i = 0; i < this.myObstacles.length; i++){
     this.player.collitions(this.myObstacles[i]);
-    console.log(i);
   }
   this.frames++;
   this.clear();
