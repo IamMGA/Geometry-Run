@@ -47,14 +47,17 @@ function Player() {
   this.scale = 0.18;
   this.frames = 0;
   this.yMove = 0;
-  this.vy = 4;
+  this.vy = 8;
+  this.gravity = 2;
   this.isJumping = false;
+  this.hasGravity = false;
 
   document.onkeydown = this.onKeyDown.bind(this);
 }
 
 Player.prototype.draw = function(){
-  this.y += this.yMove;
+  this.y += this.yMove * this.vy;
+  // console.log(this.frames);
   if (this.isReady) {
       ctx.drawImage(
       this.sprite, // Image
@@ -76,10 +79,13 @@ Player.prototype.draw = function(){
         this.frames = 0;
       }
   }
+
   if (this.isJumping && this.y >= 340) {
     this.isJumping = false;
+    this.hasGravity = false;
     this.yMove = 0;
     this.frames = 0;
+    this.gravity = 2;
     this.sprite.frameIndex = 4;
     setTimeout(function () {
     this.sprite.frameIndex = 0;
@@ -98,10 +104,18 @@ Player.prototype.jump = function(){
     }.bind(this), 200);
     setTimeout(function () {
       this.yMove = 1;
-      this.isGravity = true;
-    }.bind(this), 500);
+      this.hasGravity = true;
+    }.bind(this), 400);
   }
 
+}
+
+Player.prototype.collitions = function (obstacle){
+  if(this.x + this.sprite.width/this.sprite.frames*this.scale < obstacle.x || this.y + this.sprite.height*this.scale < obstacle.y && this.x > obstacle.x){
+    this.x;
+  }else{
+    this.x-=5
+  }
 }
 
 Player.prototype.moveLeft = function () {

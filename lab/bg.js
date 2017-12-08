@@ -2,7 +2,7 @@ var canvas = document.getElementById('canvasId');
 var ctx = canvas.getContext('2d');
 
 function Background(){
-  this.x = 0;
+  this.x = canvas.width;
   this.y = 0;
   this.img = new Image();
   this.img.src = "images/background.png";
