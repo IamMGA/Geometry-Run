@@ -48,15 +48,11 @@ function Player() {
   this.frames = 0;
   this.yMove = 0;
   this.vy = 8;
-  this.gravity = 2;
   this.isJumping = false;
   this.hasGravity = false;
+  this.canMove = true;
   this.suelo = 340;
 
-  this.left = function () { return this.x }
-  this.right = function () { return (this.x + this.width) }
-  this.top = function () { return this.y }
-  this.bottom = function () { return this.y + (this.height) }
   document.onkeydown = this.onKeyDown.bind(this);
 }
 
@@ -87,14 +83,22 @@ Player.prototype.draw = function(){
 
   if (this.isJumping && this.y >= this.suelo) {
     this.isJumping = false;
-    this.hasGravity = false;
     this.yMove = 0;
     this.frames = 0;
-    this.gravity = 2;
     this.sprite.frameIndex = 4;
     setTimeout(function () {
     this.sprite.frameIndex = 0;
     }.bind(this), 200);
+  }
+}
+
+Player.prototype.gravity = function(){
+  if (this.hasGravity) {
+    this.yMove = 1;
+  }
+  if (this.hasGravity && this.y > this.suelo && this.hasGravity) {
+    this.hasGravity = false;
+    this.yMove = 0;
   }
 }
 
@@ -109,31 +113,71 @@ Player.prototype.jump = function(){
     }.bind(this), 200);
     setTimeout(function () {
       this.yMove = 1;
-      this.hasGravity = true;
     }.bind(this), 400);
   }
 
 }
 
-Player.prototype.collitions = function (obstacle) {
-  if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + this.sprite.height * this.scale < obstacle.y || this.x > obstacle.x) {
+Player.prototype.collitions = function(obstacle){
+  this.playerHeight = Math.floor(this.sprite.height*this.scale -4);
+  this.playerWidth = Math.floor(this.sprite.width/this.sprite.frames*this.scale);
+  this.obstacleHeight = Math.floor(obstacle.cube.height * this.scale);
+  this.obstacleWidth = Math.floor(obstacle.cube.width * this.scale);
+  //player cordenates
+  this.playerLeft = this.x;
+  this.playerRight = this.x + this.playerWidth;
+  this.playerTop = this.y;
+  this.playerBottom = this.y + this.playerHeight;
+  //obstacle cordenates
+  this.obstacleLeft = obstacle.x;
+  this.obstacleRigth = obstacle.x + this.obstacleWidth
+  this.obstacleTop = obstacle.y;
+  this.obstacleBottom = obstacle.y + this.obstacleHeight;
+
+
+  if(this.playerRight<=this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth){
+    this.canMove = true;
     this.x;
-  } else {
-    this.x -= 5
+  }else{
+    this.canMove = false;
+    this.x-=5;
   }
-  if (this.y + obstacle.cube.height * this.scale && this.x > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
-    this.suelo = obstacle.y - this.sprite.height * this.scale;
-  } else {
+
+  if (this.playerBottom < this.obstacleTop && this.playerRight > this.obstacleLeft) {
+    this.suelo = this.obstacleTop - this.playerHeight;
+  }
+
+  if(this.playerLeft >= this.obstacleRigth && this.playerBottom == this.obstacleTop){
+    debugger;
+    this.hasGravity = true;
     this.suelo = 340;
   }
+  //else if(this.playerBottom === this.obstacleTop && this.playerLeft > this.obstacleRigth && !this.isJumping && !this.hasGravity){
+  //   this.hasGravity = true;
+  //   this.suelo = 340;
+  // }
 }
+// Player.prototype.collitions = function (obstacle) {
+//   if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + (this.sprite.height * this.scale -4) <= obstacle.y || this.x >= obstacle.x + obstacle.cube.width*this.scale) {
+//     this.x;
+//   } else {
+//     this.x -= 5
+//   }
+//   if (this.y + obstacle.cube.height * this.scale < obstacle.y && this.x + this.sprite.height*this.scale > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
+//     this.suelo = obstacle.y - this.sprite.height * this.scale;
+//   } else if(this.suelo < 340 && this.x > obstacle.x + obstacle.cube.width*this.scale && !this.isJumping){
+//     this.hasGravity = true;
+//     this.yMove = 1;
+//     this.suelo = 340;
+//   }
+// }
 
 Player.prototype.moveLeft = function () {
-  this.x -= 5;
+  if(this.canMove){this.x -= 5}
 }
 
 Player.prototype.moveRight = function () {
-  this.x += 5;
+  if(this.canMove){this.x += 5}
 }
 
 Player.prototype.onKeyDown = function (e) {

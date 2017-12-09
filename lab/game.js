@@ -33,6 +33,7 @@ Game.prototype.draw = function () {
   this.clear();
   this.background.draw();
   this.floor.draw();
+  this.player.gravity();
   this.player.draw();
 
   for (var i = 0; i < this.myObstacles.length; i++) {
