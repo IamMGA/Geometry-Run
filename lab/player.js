@@ -81,6 +81,10 @@ Player.prototype.draw = function(){
       }
   }
 
+  if(this.hasGravity && this.y >= this.suelo){
+    this.yMove = 0;
+  }
+
   if (this.isJumping && this.y >= this.suelo) {
     this.isJumping = false;
     this.yMove = 0;
@@ -92,15 +96,15 @@ Player.prototype.draw = function(){
   }
 }
 
-Player.prototype.gravity = function(){
-  if (this.hasGravity) {
-    this.yMove = 1;
-  }
-  if (this.hasGravity && this.y > this.suelo && this.hasGravity) {
-    this.hasGravity = false;
-    this.yMove = 0;
-  }
-}
+// Player.prototype.gravity = function(){
+//   if (this.hasGravity && !this.isJumping) {
+//     this.yMove = 1;
+//   }
+//   if (this.hasGravity && this.y > this.suelo && this.hasGravity) {
+//     this.hasGravity = false;
+//     this.yMove = 0;
+//   }
+// }
 
 Player.prototype.jump = function(){
   console.log("jump");
@@ -118,59 +122,59 @@ Player.prototype.jump = function(){
 
 }
 
-Player.prototype.collitions = function(obstacle){
-  this.playerHeight = Math.floor(this.sprite.height*this.scale -4);
-  this.playerWidth = Math.floor(this.sprite.width/this.sprite.frames*this.scale);
-  this.obstacleHeight = Math.floor(obstacle.cube.height * this.scale);
-  this.obstacleWidth = Math.floor(obstacle.cube.width * this.scale);
-  //player cordenates
-  this.playerLeft = this.x;
-  this.playerRight = this.x + this.playerWidth;
-  this.playerTop = this.y;
-  this.playerBottom = this.y + this.playerHeight;
-  //obstacle cordenates
-  this.obstacleLeft = obstacle.x;
-  this.obstacleRigth = obstacle.x + this.obstacleWidth
-  this.obstacleTop = obstacle.y;
-  this.obstacleBottom = obstacle.y + this.obstacleHeight;
+// Player.prototype.collitions = function(obstacle){
+//   this.playerHeight = Math.floor(this.sprite.height*this.scale -4);
+//   this.playerWidth = Math.floor(this.sprite.width/this.sprite.frames*this.scale);
+//   this.obstacleHeight = Math.floor(obstacle.cube.height * this.scale);
+//   this.obstacleWidth = Math.floor(obstacle.cube.width * this.scale);
+//   //player cordenates
+//   this.playerLeft = this.x;
+//   this.playerRight = this.x + this.playerWidth;
+//   this.playerTop = this.y;
+//   this.playerBottom = this.y + this.playerHeight;
+//   //obstacle cordenates
+//   this.obstacleLeft = obstacle.x;
+//   this.obstacleRigth = obstacle.x + this.obstacleWidth
+//   this.obstacleTop = obstacle.y;
+//   this.obstacleBottom = obstacle.y + this.obstacleHeight;
 
 
-  if(this.playerRight<=this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth){
-    this.canMove = true;
-    this.x;
-  }else{
-    this.canMove = false;
-    this.x-=5;
-  }
+  // if(this.playerRight<=this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth){
+  //   this.canMove = true;
+  //   this.x;
+  // }else{
+  //   this.canMove = false;
+  //   this.x-=5;
+  // }
 
-  if (this.playerBottom < this.obstacleTop && this.playerRight > this.obstacleLeft) {
-    this.suelo = this.obstacleTop - this.playerHeight;
-  }
+  // if (this.playerBottom < this.obstacleTop && this.playerRight > this.obstacleLeft) {
+  //   this.suelo = this.obstacleTop - this.playerHeight;
+  // }
 
-  if(this.playerLeft >= this.obstacleRigth && this.playerBottom == this.obstacleTop){
-    debugger;
-    this.hasGravity = true;
-    this.suelo = 340;
-  }
+  // if(this.playerLeft >= this.obstacleRigth && this.playerBottom == this.obstacleTop){
+  //   debugger;
+  //   this.hasGravity = true;
+  //   this.suelo = 340;
+  // }
   //else if(this.playerBottom === this.obstacleTop && this.playerLeft > this.obstacleRigth && !this.isJumping && !this.hasGravity){
   //   this.hasGravity = true;
   //   this.suelo = 340;
   // }
-}
-// Player.prototype.collitions = function (obstacle) {
-//   if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + (this.sprite.height * this.scale -4) <= obstacle.y || this.x >= obstacle.x + obstacle.cube.width*this.scale) {
-//     this.x;
-//   } else {
-//     this.x -= 5
-//   }
-//   if (this.y + obstacle.cube.height * this.scale < obstacle.y && this.x + this.sprite.height*this.scale > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
-//     this.suelo = obstacle.y - this.sprite.height * this.scale;
-//   } else if(this.suelo < 340 && this.x > obstacle.x + obstacle.cube.width*this.scale && !this.isJumping){
-//     this.hasGravity = true;
-//     this.yMove = 1;
-//     this.suelo = 340;
-//   }
 // }
+Player.prototype.collitions = function (obstacle) {
+  if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + (this.sprite.height * this.scale -4) <= obstacle.y || this.x >= obstacle.x + obstacle.cube.width*this.scale) {
+    this.x;
+  } else {
+    this.x -= 5
+  }
+  if (this.y + obstacle.cube.height * this.scale < obstacle.y && this.x + this.sprite.height*this.scale > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
+    this.suelo = obstacle.y - this.sprite.height * this.scale;
+  } else if(this.suelo < 340 && this.x > obstacle.x + obstacle.cube.width*this.scale && !this.isJumping){
+    this.hasGravity = true;
+    this.yMove = 1;
+    this.suelo = 340;
+  }
+}
 
 Player.prototype.moveLeft = function () {
   if(this.canMove){this.x -= 5}
