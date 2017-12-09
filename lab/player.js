@@ -37,7 +37,7 @@ function Player() {
   this.sprite = new Image();
   this.sprite.src = "images/iron-sprite-all.png";
   this.isReady = false;
-  this.sprite.onload = (function() {
+  this.sprite.onload = (function () {
     this.isReady = true;
   }).bind(this);
   this.sprite.frames = 8;
@@ -53,14 +53,23 @@ function Player() {
   this.canMove = true;
   this.suelo = 340;
 
+  this.keys = [];
+
   document.onkeydown = this.onKeyDown.bind(this);
+  document.onkeyup = this.onkeyup.bind(this);
+  // document.onkeydown = function (e) {
+  //   this.keys[e.keyCode] = true;
+  // }
+  // document.onkeyup = function (e) {
+  //   this.keys[e.keyCode] = false;
+  // }
 }
 
-Player.prototype.draw = function(){
+Player.prototype.draw = function () {
   this.y += this.yMove * this.vy;
   // console.log(this.frames);
   if (this.isReady) {
-      ctx.drawImage(
+    ctx.drawImage(
       this.sprite, // Image
       this.sprite.frameIndex * Math.floor(this.sprite.width / this.sprite.frames), // source x 
       0, // source y: allways 0 for this image
@@ -69,20 +78,21 @@ Player.prototype.draw = function(){
       this.x, // destination x
       this.y, // destination y
       Math.floor(this.sprite.width / this.sprite.frames) * this.scale, // destination frame width 
-      this.sprite.height * this.scale) ; // destination frame heigth
-      this.frames++;
-      if(this.frames == 7 && !this.isJumping){
-        if (this.sprite.frameIndex === 2) {
-          this.sprite.frameIndex = 0;
-        } else {
-          this.sprite.frameIndex++;
-        }
-        this.frames = 0;
+      this.sprite.height * this.scale); // destination frame heigth
+    this.frames++;
+    if (this.frames == 7 && !this.isJumping) {
+      if (this.sprite.frameIndex === 2) {
+        this.sprite.frameIndex = 0;
+      } else {
+        this.sprite.frameIndex++;
       }
+      this.frames = 0;
+    }
   }
 
-  if(this.hasGravity && this.y >= this.suelo){
+  if (this.hasGravity && this.y >= this.suelo && !this.isJumping) {
     this.yMove = 0;
+    this.hasGravity = false;
   }
 
   if (this.isJumping && this.y >= this.suelo) {
@@ -91,7 +101,7 @@ Player.prototype.draw = function(){
     this.frames = 0;
     this.sprite.frameIndex = 4;
     setTimeout(function () {
-    this.sprite.frameIndex = 0;
+      this.sprite.frameIndex = 0;
     }.bind(this), 200);
   }
 }
@@ -106,21 +116,21 @@ Player.prototype.draw = function(){
 //   }
 // }
 
-Player.prototype.jump = function(){
-  console.log("jump");
-  if (!this.isJumping){
-    this.isJumping = true;
-    this.yMove = -1;
-    this.sprite.frameIndex = 4;
-    setTimeout(function () {
-      this.sprite.frameIndex = 5;
-    }.bind(this), 200);
-    setTimeout(function () {
-      this.yMove = 1;
-    }.bind(this), 400);
-  }
+// Player.prototype.jump = function () {
+//   console.log("jump");
+//   if (!this.isJumping) {
+//     this.isJumping = true;
+//     this.yMove = -1;
+//     this.sprite.frameIndex = 4;
+//     setTimeout(function () {
+//       this.sprite.frameIndex = 5;
+//     }.bind(this), 200);
+//     setTimeout(function () {
+//       this.yMove = 1;
+//     }.bind(this), 400);
+//   }
 
-}
+// }
 
 // Player.prototype.collitions = function(obstacle){
 //   this.playerHeight = Math.floor(this.sprite.height*this.scale -4);
@@ -139,55 +149,112 @@ Player.prototype.jump = function(){
 //   this.obstacleBottom = obstacle.y + this.obstacleHeight;
 
 
-  // if(this.playerRight<=this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth){
-  //   this.canMove = true;
-  //   this.x;
-  // }else{
-  //   this.canMove = false;
-  //   this.x-=5;
-  // }
+// if(this.playerRight<=this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth){
+//   this.canMove = true;
+//   this.x;
+// }else{
+//   this.canMove = false;
+//   this.x-=5;
+// }
 
-  // if (this.playerBottom < this.obstacleTop && this.playerRight > this.obstacleLeft) {
-  //   this.suelo = this.obstacleTop - this.playerHeight;
-  // }
+// if (this.playerBottom < this.obstacleTop && this.playerRight > this.obstacleLeft) {
+//   this.suelo = this.obstacleTop - this.playerHeight;
+// }
 
-  // if(this.playerLeft >= this.obstacleRigth && this.playerBottom == this.obstacleTop){
-  //   debugger;
-  //   this.hasGravity = true;
-  //   this.suelo = 340;
-  // }
-  //else if(this.playerBottom === this.obstacleTop && this.playerLeft > this.obstacleRigth && !this.isJumping && !this.hasGravity){
-  //   this.hasGravity = true;
-  //   this.suelo = 340;
-  // }
+// if(this.playerLeft >= this.obstacleRigth && this.playerBottom == this.obstacleTop){
+//   debugger;
+//   this.hasGravity = true;
+//   this.suelo = 340;
+// }
+//else if(this.playerBottom === this.obstacleTop && this.playerLeft > this.obstacleRigth && !this.isJumping && !this.hasGravity){
+//   this.hasGravity = true;
+//   this.suelo = 340;
+// }
 // }
 Player.prototype.collitions = function (obstacle) {
-  if (this.x + this.sprite.width / this.sprite.frames * this.scale <= obstacle.x || this.y + (this.sprite.height * this.scale -4) <= obstacle.y || this.x >= obstacle.x + obstacle.cube.width*this.scale) {
+
+  this.playerHeight = Math.floor(this.sprite.height * this.scale - 4);
+  this.playerWidth = Math.floor(this.sprite.width / this.sprite.frames * this.scale);
+  this.obstacleHeight = Math.floor(obstacle.cube.height * this.scale);
+  this.obstacleWidth = Math.floor(obstacle.cube.width * this.scale);
+  //player cordenates
+  this.playerLeft = this.x;
+  this.playerRight = this.x + this.playerWidth;
+  this.playerTop = this.y;
+  this.playerBottom = this.y + this.playerHeight;
+  //obstacle cordenates
+  this.obstacleLeft = obstacle.x;
+  this.obstacleRigth = obstacle.x + this.obstacleWidth
+  this.obstacleTop = obstacle.y;
+  this.obstacleBottom = obstacle.y + this.obstacleHeight;
+
+  if (this.playerRight <= this.obstacleLeft || this.playerBottom <= this.obstacleTop || this.playerLeft >= this.obstacleRigth) {
+    this.canMove = true;
     this.x;
   } else {
+    this.canMove = false;
     this.x -= 5
   }
-  if (this.y + obstacle.cube.height * this.scale < obstacle.y && this.x + this.sprite.height*this.scale > obstacle.x && this.x < obstacle.x + obstacle.cube.width*this.scale) {
+  if (this.y + obstacle.cube.height * this.scale < obstacle.y && this.x + this.sprite.height * this.scale > obstacle.x && this.x < obstacle.x + obstacle.cube.width * this.scale) {
     this.suelo = obstacle.y - this.sprite.height * this.scale;
-  } else if(this.suelo < 340 && this.x > obstacle.x + obstacle.cube.width*this.scale && !this.isJumping){
+  } else if (this.suelo < 340 && this.x > obstacle.x + obstacle.cube.width * this.scale && this.x <= obstacle.x + obstacle.cube.width * this.scale + 3) {
     this.hasGravity = true;
     this.yMove = 1;
     this.suelo = 340;
   }
 }
 
-Player.prototype.moveLeft = function () {
-  if(this.canMove){this.x -= 5}
-}
+Player.prototype.movements = function () {
+  if (this.keys[32]) {
+    console.log("jump");
+    if (!this.isJumping) {
+      this.isJumping = true;
+      this.yMove = -1;
+      this.sprite.frameIndex = 4;
+      setTimeout(function () {
+        this.sprite.frameIndex = 5;
+      }.bind(this), 200);
+      setTimeout(function () {
+        this.yMove = 1;
+      }.bind(this), 400);
+    }
 
-Player.prototype.moveRight = function () {
-  if(this.canMove){this.x += 5}
-}
+  }
 
-Player.prototype.onKeyDown = function (e) {
-  switch (e.keyCode) {
-    case 32: this.jump();      console.log('up',    this); break;
-    case 37: this.moveLeft();  console.log('left',  this); break;
-    case 39: this.moveRight(); console.log('right', this); break;
+  if (this.keys[37]) {
+    if (this.canMove && this.x >= 0) {
+      this.x -= 5;
+    }
+  }
+  if (this.keys[39]) {
+    if (this.canMove) {
+      this.x += 5;
+    }
   }
 }
+
+// Player.prototype.moveLeft = function () {
+//   if(this.canMove && this.x >= 0){
+//     this.x -= 5;
+//   }
+// }
+
+// Player.prototype.moveRight = function () {
+//   if(this.canMove){
+//     this.x += 5;
+//   }
+// }
+
+Player.prototype.onKeyDown = function (e) {
+    this.keys[e.keyCode] = true;
+}
+
+Player.prototype.onkeyup = function (e){
+      this.keys[e.keyCode] = false;
+}
+  // document.onkeydown = function (e) {
+  //   this.keys[e.keyCode] = true;
+  // }
+  // document.onkeyup = function (e) {
+  //   this.keys[e.keyCode] = false;
+  // }
