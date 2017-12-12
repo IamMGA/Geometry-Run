@@ -11,6 +11,12 @@ function Obstacles(){
   this.cube.onload = function () {
     this.cube.isReady = true;
   }.bind(this);
+  this.posYRandom()
+}
+Obstacles.prototype.posYRandom = function(){
+  this.random = Math.floor(Math.random() * (3 - 0)) + 0;
+  this.randomPos = Math.floor(this.cube.height * this.scale) * this.random;
+  return this.y = this.y - this.randomPos;
 }
 
 Obstacles.prototype.cubes = function(){
